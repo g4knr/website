@@ -1,0 +1,31 @@
+.splide__pagination {
+	display: none;
+}
+
+.splide__track {
+	overflow: visible;
+}
+
+.splide button {
+	border-color: currentColor;
+}
+
+.splide button:disabled:hover {
+	color: inherit;
+	/* color: var(--g-dark); */
+}
+
+.splide button svg {
+	transition-property: opacity;
+	transition-duration: inherit;
+	transition-timing-function: inherit;
+	transition-delay: 0s;
+	-webkit-transition-property: opacity;
+	-webkit-transition-duration: inherit;
+	-webkit-transition-timing-function: inherit;
+	-webkit-transition-delay: 0s;
+}
+
+.splide button:disabled svg {
+	opacity: 0.2;
+}
