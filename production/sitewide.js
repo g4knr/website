@@ -22,11 +22,8 @@ function closeNav() {
 
 	// toggle aria options when navButton is clicked
 	navButton.onclick = () => {
-		console.log("clicked");
 		const isOpen =
 			navButton.getAttribute("aria-expanded") === "true" ? false : true;
-		console.log(navButton.getAttribute("aria-expanded"));
-		console.log(isOpen);
 		navButton.setAttribute("aria-expanded", isOpen);
 	};
 
