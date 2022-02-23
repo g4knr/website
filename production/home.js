@@ -68,11 +68,35 @@ projects
 function iframeChange(iframe, loaded) {
 	// get a reference to the w-embed and loading wrapper
 	const wEmbed = iframe.closest(".w-embed"),
-		loadingWrapper = wEmbed.parentNode.querySelector(".loading__wrapper");
+		loadingWrapper = wEmbed
+			.closest(".project__iframe-wrapper")
+			.querySelector(".loading__wrapper");
 
 	// determine opacity based on whether loaded or loading
 	const loadingOpacity = loaded ? 0 : 1;
 	loadingWrapper.style.opacity = loadingOpacity;
+}
+
+// function to set the iframe source
+function setIframeSource(projectTab) {
+	// find the current slide
+	const currentSlide = projectTab.closest(".splide__slide"),
+		iframe = currentSlide.querySelector("iframe");
+
+	// set the iframe source
+	iframeChange(iframe, false);
+	iframe.onload = iframeChange(iframe, true);
+	iframe.src = projectTab.href;
+}
+
+// function to hide or show url links
+function showProjectControls(projectTab) {
+	const moveBy =
+			projectTab.getAttribute("data-tab-type") === "design" ? "100%" : "0%",
+		currentSlide = projectTab.closest(".splide__slide"),
+		projectControls = currentSlide.querySelector(".project__link-wrapper");
+
+	projectControls.style.transform = `translate(0px, ${moveBy})`;
 }
 
 /* function to change iframe source when clicking project tabs */
@@ -80,26 +104,66 @@ function projectTabs() {
 	// get a reference to all tabs and loop through them
 	const projectTabs = document.querySelectorAll(".project__iframe-tab");
 
-	function projectTabClick(projectTab) {
-		// find the current slide
-		const currentSlide = projectTab.closest(".splide__slide"),
-			iframe = currentSlide.querySelector("iframe");
-
-		// set the iframe source
-		iframeChange(iframe, false);
-		iframe.onload = iframeChange(iframe, true);
-		iframe.src = projectTab.href;
-	}
-
+	// run functions for each project tab
 	projectTabs.forEach((projectTab, index) => {
 		if (index === 0) {
-			projectTabClick(projectTab);
+			setIframeSource(projectTab);
 		}
 
 		projectTab.onclick = (event) => {
 			// prevent the link from opening and call the project tab function
 			event.preventDefault();
-			projectTabClick(projectTab);
+			setIframeSource(projectTab);
+			showProjectControls(projectTab);
+			if (projectTab.getAttribute("data-tab-type") === "design") {
+				const iframeWrapper = projectTab
+					.closest(".splide__slide")
+					.querySelector(".project-iframe");
+				iframeWrapperResize(iframeWrapper, "auto");
+				iframeEmbedResize(iframeWrapper, "auto");
+			}
+		};
+	});
+}
+
+function iframeWrapperResize(iframeWrapper, device) {
+	if (device === "mobile") {
+		iframeWrapper.style.height = `100%`;
+		iframeWrapper.style.width = `${(iframeWrapper.offsetHeight / 16) * 9}px`;
+	} else if (device === "desktop") {
+		iframeWrapper.style.width = `100%`;
+		iframeWrapper.style.height = `${(iframeWrapper.offsetWidth / 16) * 9}px`;
+	} else if (device === "auto") {
+		iframeWrapper.style.height = `100%`;
+		iframeWrapper.style.width = `100%`;
+	}
+}
+
+function iframeEmbedResize(iframeWrapper, iconType) {
+	const iframeEmbed = iframeWrapper.querySelector(".project__iframe"),
+		deviceSizes = {
+			mobile: 420,
+			desktop: 1440,
+			auto: iframeWrapper.offsetWidth
+		};
+	let scale = deviceSizes[iconType] / iframeWrapper.offsetWidth;
+	iframeEmbed.style.width = `${100 * scale}%`;
+	iframeEmbed.style.height = `${100 * scale}%`;
+	iframeEmbed.style.transform = `scale(${1 / scale})`;
+}
+
+function projectDevices() {
+	const projectDevices = document.querySelectorAll("[data-iframe-device]");
+
+	projectDevices.forEach((projectDevice) => {
+		const iconType = projectDevice.getAttribute("data-iframe-device"),
+			iframeWrapper = projectDevice
+				.closest(".project__iframe-wrapper")
+				.querySelector(".project-iframe");
+
+		projectDevice.onclick = () => {
+			iframeWrapperResize(iframeWrapper, iconType);
+			iframeEmbedResize(iframeWrapper, iconType);
 		};
 	});
 }
@@ -127,10 +191,8 @@ function projectSlider() {
 		// if the slide is active
 		if (active) {
 			// get the design link and set the iframe's src
-			const designLink = currentSlide.querySelector(".project__iframe-tab")
-				.href;
-			iframe.onload = iframeChange(iframe, true);
-			iframe.src = designLink;
+			const projectTab = currentSlide.querySelector(".project__iframe-tab");
+			setIframeSource(projectTab);
 		} else {
 			iframe.removeAttribute("src");
 			iframeChange(iframe, false);
@@ -231,6 +293,7 @@ function homePrep() {
 	processPosition();
 	processCards();
 	projectTabs();
+	projectDevices();
 	projectSlider();
 	projectTags();
 	projectTestimonials();
