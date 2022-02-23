@@ -1,4 +1,4 @@
-console.log("production - home");
+console.log("development - home");
 
 /*
 *****
@@ -111,16 +111,23 @@ function projectTabs() {
 		}
 
 		projectTab.onclick = (event) => {
-			// prevent the link from opening and call the project tab function
 			event.preventDefault();
-			setIframeSource(projectTab);
-			showProjectControls(projectTab);
-			if (projectTab.getAttribute("data-tab-type") === "design") {
-				const iframeWrapper = projectTab
-					.closest(".splide__slide")
-					.querySelector(".project-iframe");
-				iframeWrapperResize(iframeWrapper, "auto");
-				iframeEmbedResize(iframeWrapper, "auto");
+			// get the href of the projectTab and decide next steps
+			console.log(projectTab.href.includes(".webflow.io"));
+			console.log(projectTab.href);
+			if (!projectTab.href.includes(".webflow.io")) {
+				// prevent the link from opening and call the project tab function
+				setIframeSource(projectTab);
+				showProjectControls(projectTab);
+				if (projectTab.getAttribute("data-tab-type") === "design") {
+					const iframeWrapper = projectTab
+						.closest(".splide__slide")
+						.querySelector(".project-iframe");
+					iframeWrapperResize(iframeWrapper, "auto");
+					iframeEmbedResize(iframeWrapper, "auto");
+				}
+			} else {
+				window.open(projectTab.href, "_blank");
 			}
 		};
 	});
